@@ -55,5 +55,18 @@ router.get('/articles/:id', function(req, res){
     });
 });
 
+router.post('/create', function(req, res){
+    console.log('Posting an Article');
+    var newArticle = new article();
+    newArticle.title = req.body.title;
+    newArticle.content = req.body.content;
+    newArticle.save(function(err, article){
+        if(err){
+            console.log('Error instering the article');
+        }else{
+            res.json(article);
+        }
+    });
+});
 
 module.exports = router;
