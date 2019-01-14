@@ -3,6 +3,7 @@ const router = express.Router();
 const mongoose = require('mongoose');
 const article = require('../models/article');
 
+
 var db = 'mongodb://ahmad:heartis10@ds139934.mlab.com:39934/blogapp';
 
 mongoose.Promise = global.Promise;
@@ -25,11 +26,13 @@ const options = {
 
 
 
-mongoose.connect(db, options)
-.then(() => console.log('connecting to database successful'))
-.catch(err => console.error('could not connect to mongo DB', err));
+mongoose.connect(db, options, function(err){
+    if(err){
+        console.log('Error Connecting');
+    }
+});
 
-router.get('/all', function(req, res){
+router.get('/all', function(_req, res){
     article.find({}).exec(function(err, articles){
         if(err){
             console.log('Error getting the articles');
@@ -40,5 +43,30 @@ router.get('/all', function(req, res){
     });
 });
 
+router.get('/articles/:id', function(req, res){
+    console.log('Requesting a specific article');
+    article.findById(req.param.id)
+    .exec(function(err, article){
+        if(err){
+            console.log('Error getting the article');
+        }else{
+            res.json(article);
+        }
+    });
+});
+
+router.post('/create', function(req, res){
+    console.log('Posting an Article');
+    var newArticle = new article();
+    newArticle.title = req.body.title;
+    newArticle.content = req.body.content;
+    newArticle.save(function(err, article){
+        if(err){
+            console.log('Error instering the article');
+        }else{
+            res.json(article);
+        }
+    });
+});
 
 module.exports = router;
