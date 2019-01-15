@@ -11,6 +11,7 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 })
 export class CreateComponent implements OnInit {
 
+  article: Article;
   articleForm: FormGroup;
   articles: Array<Article>;
 
@@ -20,18 +21,44 @@ export class CreateComponent implements OnInit {
     this._articleService.getArticles()
     .subscribe(res => this.articles = res );
 
+    this.aR.params.subscribe((params) => {
+      if(params['id']){
+        this._articleService.getArticle(params['id'])
+        .subscribe(res => {
+          this.article = res;
+          this.articleForm = this.fb.group({
+            'title': [this.article['title'], Validators.compose([Validators.required, Validators.maxLength(10), Validators.maxLength(45)])],
+            'content': [this.article['content'], Validators.compose([Validators.required, Validators.maxLength(10)])]
+          });
+        });
+      } else {
+        this.articleForm = this.fb.group({
+          'title': [null, Validators.compose([Validators.required, Validators.maxLength(10), Validators.maxLength(45)])],
+          'content': [null, Validators.compose([Validators.required, Validators.maxLength(10)])]
+        });
+      }
+    })
+  
     this.articleForm = this.fb.group({
       'title': [null, Validators.compose([Validators.required, Validators.maxLength(10), Validators.maxLength(45)])],
       'content': [null, Validators.compose([Validators.required, Validators.maxLength(10)])]
     });
   }
 
-  addArticle(article: Article) {
+  addArticle(articleId, article: Article) {
+    if(articleId !== undefined){
+      this._articleService.updateArticle(article, article._id)
+      .subscribe(updateArticle => {
+        this.router.navigateByUrl('/');
+      })
+    } else{
+
     this._articleService.insertArticle(article)
     .subscribe(newArticle => {
       this.articles.push(newArticle);
       this.router.navigateByUrl('/');
     });
+    }
   }
 
 }

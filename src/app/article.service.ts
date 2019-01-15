@@ -33,4 +33,19 @@ export class ArticleService {
     return this._http.post('/api/create', JSON.stringify(post), options)
     .map(result => this.result = result.json());
   }
+
+
+  updateArticle(post: Article, id : any) {
+    const headers = new Headers({'Content-Type': 'application/json'});
+    const options = new RequestOptions({headers: headers});
+
+    return this._http.post('/api/update/' + id, JSON.stringify(post), options)
+    .map(result => this.result = result.json());
+  }
+
+  deleteArticle(id: any) {
+    return this._http.get('/api/delete' + id)
+    .map(result => this.result = result.json());
+  }
+
 }
